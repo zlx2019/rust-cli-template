@@ -1,0 +1,70 @@
+[package]
+name = "{{project-name}}"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.96.0"
+authors = ["{{authors}}"]
+description = "{{description}}"
+documentation = "https://docs.rs/{{project-name}}"
+homepage = "https://github.com/{{gh_username}}/{{project-name}}"
+repository = "https://github.com/{{gh_username}}/{{project-name}}"
+readme = "README.md"
+license = "{{license}}"
+keywords = []
+
+[dependencies]
+# CLI 参数解析（模板核心依赖，固定内置）
+clap = { version = "4", features = ["derive"] }
+# 顶层错误处理，配合 main 的 anyhow::Result 使用（模板核心依赖，固定内置）
+anyhow = "1"
+{%- if ask_for_async -%}
+  {%- if multi_choice contains "full" %}
+tokio = { version = "1", features = ["full"] }
+  {%- else %}
+tokio = { version = "1", features = [{%- for feature in multi_choice -%} "{{feature}}"{% unless forloop.last %}, {%endunless -%} {%- endfor -%} ] }
+  {%- endif %}
+{%- endif %}
+{%- if ask_common_libs contains "uuid" %}
+uuid = { version = "1", features = ["v4"] }
+{%- endif %}
+{%- if ask_common_libs contains "rand" %}
+rand = "0.10"
+{%- endif %}
+{%- if ask_common_libs contains "serde_json" %}
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+{%- endif %}
+{%- if ask_common_libs contains "chrono" %}
+chrono = "0.4"
+{%- endif %}
+{%- if ask_common_libs contains "reqwest" %}
+reqwest = { version = "0.13", features = ["json"] }
+{%- endif %}
+{%- if ask_common_libs contains "tracing" %}
+tracing = "0.1"
+{%- endif %}
+
+[dev-dependencies]
+
+[build-dependencies]
+
+[features]
+
+
+### Lint 规则
+[lints.rust]
+unsafe_code = "warn"      # 使用 unsafe 代码时告警（确需时可局部 #[allow]）
+missing_docs = "warn"     # 公共项缺少文档注释时告警
+
+[lints.clippy]
+unwrap_used = "warn"      # 使用 unwrap 时告警（测试/原型代码可局部 allow）
+
+### Working directory
+[workspace]
+members = []
+
+### Production packaging configuration
+[profile.release]
+
+### Debug packaging configuration
+[profile.dev]
