@@ -1,4 +1,3 @@
-//! 子命令模块集合。
-//!
+//! Subcommand implementations.
 
 pub mod greet;

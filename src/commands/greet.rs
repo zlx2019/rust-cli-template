@@ -1,15 +1,22 @@
-//! `greet` 示例子命令：演示位置参数、可选项与全局 `--verbose` 的配合使用。
+//! `greet` subcommand: prints a greeting a configurable number of times.
 
 use anyhow::Result;
 use clap::Args;
 
+/// Arguments for the `greet` subcommand.
 #[derive(Debug, Args)]
 pub struct GreetArgs {
+    /// Name to greet.
     pub name: String,
+
+    /// Number of times to repeat the greeting.
     #[arg(short, long, default_value_t = 1)]
     pub count: u8,
 }
 
+/// Runs the `greet` subcommand: prints `Hello, <name>!` `count` times.
+///
+/// When `verbose` is non-zero, the resolved arguments are logged to stderr.
 pub fn run(args: GreetArgs, verbose: u8) -> Result<()> {
     if verbose > 0 {
         eprintln!("[debug] greet name={} count={}", args.name, args.count);
@@ -24,7 +31,7 @@ pub fn run(args: GreetArgs, verbose: u8) -> Result<()> {
 mod tests {
     use super::*;
 
-    /// 校验 `greet` 在正常参数下可成功执行。
+    /// `greet` should run successfully with valid arguments.
     #[test]
     fn greet_runs_without_error() {
         let args = GreetArgs {

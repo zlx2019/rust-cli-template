@@ -13,9 +13,7 @@ license = "{{license}}"
 keywords = []
 
 [dependencies]
-# CLI 参数解析（模板核心依赖，固定内置）
 clap = { version = "4", features = ["derive"] }
-# 顶层错误处理，配合 main 的 anyhow::Result 使用（模板核心依赖，固定内置）
 anyhow = "1"
 {%- if ask_for_async -%}
   {%- if multi_choice contains "full" %}
@@ -51,7 +49,6 @@ tracing = "0.1"
 [features]
 
 
-### Lint 规则
 [lints.rust]
 unsafe_code = "warn"      # 使用 unsafe 代码时告警（确需时可局部 #[allow]）
 missing_docs = "warn"     # 公共项缺少文档注释时告警

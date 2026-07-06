@@ -9,8 +9,6 @@ All notable changes to this project will be documented in this file. See [conven
 """
 # template for the changelog body
 # https://keats.github.io/tera/docs/#introduction
-# 仓库链接由 remote_url 宏在运行时自动推断（取当前分支 upstream 指向的 GitHub 仓库）。
-# 分支尚无 upstream 时（从未 git push -u），可通过环境变量 GITHUB_REPO=owner/repo 显式指定。
 body = """
 {%- macro remote_url() -%}
   https://github.com/{{ remote.github.owner }}/{{ remote.github.repo }}

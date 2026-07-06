@@ -1,22 +1,24 @@
-//! 命令行接口定义。
+//! CLI definition and command dispatch.
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 use crate::commands;
 
+/// Top-level command-line interface: global options plus the subcommand to run.
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
-    /// 待执行的子命令。
+    /// Subcommand to execute.
     #[command(subcommand)]
     pub command: Commands,
 
-    /// 输出更详细的日志，可叠加（如 `-vv` 提高级别）。
+    /// Increase log verbosity; repeat to raise the level (e.g. `-vv`).
     #[arg(short, long, global = true, action = clap::ArgAction::Count)]
     pub verbose: u8,
 }
 
+/// Supported subcommands.
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     /// Example command
@@ -24,7 +26,7 @@ pub enum Commands {
 }
 
 impl Cli {
-    /// 根据解析结果分发并执行对应子命令。
+    /// Dispatches to and runs the selected subcommand.
     pub fn run(self) -> Result<()> {
         match self.command {
             Commands::Greet(args) => commands::greet::run(args, self.verbose),
