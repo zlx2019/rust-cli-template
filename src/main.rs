@@ -11,7 +11,6 @@ use clap::Parser;
 
 use crate::cli::Cli;
 
-/// 程序主入口：解析命令行参数后交由 [`Cli::run`] 执行。
 fn main() -> Result<()> {
     let cli = Cli::parse();
     cli.run()

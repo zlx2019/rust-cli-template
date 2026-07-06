@@ -1,14 +1,10 @@
 //! 命令行接口定义。
-//!
-//! 使用 clap 的 derive API 声明全局参数与子命令。程序名、版本、描述等元信息
-//! 由 clap 自动从 Cargo.toml 的 `CARGO_PKG_*` 环境变量读取，无需手动维护。
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 
 use crate::commands;
 
-/// 顶层命令行参数。
 #[derive(Debug, Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
@@ -21,10 +17,9 @@ pub struct Cli {
     pub verbose: u8,
 }
 
-/// 支持的子命令集合。
 #[derive(Debug, Subcommand)]
 pub enum Commands {
-    /// 向指定对象打招呼（示例子命令）。
+    /// Example command
     Greet(commands::greet::GreetArgs),
 }
 
