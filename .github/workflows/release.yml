@@ -1,6 +1,6 @@
 name: Release
 
-# 推送 v* 标签时，自动生成 Changelog 并创建 GitHub Release
+# 推送 v* 标签时，生成 Changelog、创建 GitHub Release 并附加多平台构建产物
 on:
   push:
     tags:
@@ -10,16 +10,14 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Release
+  changelog:
+    name: Changelog
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # 依据 cliff.toml 生成本次发布的 Changelog
-      # v3 基于 Docker 构建（基础镜像 Debian buster 已 EOL，apt 源 404），v4 改为直接下载二进制
       - name: Generate changelog
         uses: orhun/git-cliff-action@v4
         with:
@@ -27,12 +25,45 @@ jobs:
           args: --latest --strip header
         env:
           OUTPUT: CHANGES.md
-          # tag 检出处于 detached HEAD，无法从分支 upstream 推断仓库地址，需显式指定
           GITHUB_REPO: ${{ github.repository }}
 
-      # 创建 GitHub Release，正文取自上一步生成的 Changelog
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           body_path: CHANGES.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build:
+    name: Build ${{ matrix.target }}
+    if: github.repository != 'zlx2019/rust-cli-template'
+    needs: changelog
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            os: ubuntu-latest
+          - target: aarch64-apple-darwin
+            os: macos-latest
+          - target: x86_64-pc-windows-msvc
+            os: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: ${{ matrix.target }}
+      - name: Resolve binary name
+        id: meta
+        shell: bash
+        run: echo "bin=$(cargo metadata --no-deps --format-version 1 | jq -r '.packages[0].name')" >> "$GITHUB_OUTPUT"
+      # Compile and package (Unix → tar.gz, Windows → zip) and attach to Release.
+      - name: Build and upload
+        uses: taiki-e/upload-rust-binary-action@v1
+        with:
+          bin: ${{ steps.meta.outputs.bin }}
+          target: ${{ matrix.target }}
+          archive: $bin-$tag-$target
+          include: README.md,LICENSE
+          leading-dir: true
           token: ${{ secrets.GITHUB_TOKEN }}
