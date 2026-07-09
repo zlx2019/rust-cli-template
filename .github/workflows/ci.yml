@@ -18,9 +18,9 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  # 格式化与 Clippy 静态检查
+  # 格式化、Clippy 静态检查与文档构建检查
   lint:
-    name: Format & Clippy
+    name: Format & Clippy & Doc
     if: github.repository != 'zlx2019/rust-cli-template'
     runs-on: ubuntu-latest
     steps:
@@ -30,6 +30,10 @@ jobs:
         run: cargo fmt --all -- --check
       - name: cargo clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
+      - name: cargo doc
+        run: cargo doc --no-deps --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
 
   # 单元测试与集成测试（使用 nextest）
   test:
